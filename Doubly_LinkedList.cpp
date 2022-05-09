@@ -26,6 +26,7 @@ int IsEmpty(Node* node) { // Check node empty
 }
 
 void AppendNode(Node** head, Node* newNode) {
+	printf("[Append Node]\n");
 	if (*head == NULL) *head = newNode;
 	else {
 		Node* tail = *head;
@@ -36,6 +37,7 @@ void AppendNode(Node** head, Node* newNode) {
 }
 
 void InsertNode(Node** head, Node* newNode, int pos) {
+	printf("[InsertNode]\n");
 	if (*head == NULL) return;
 	else {
 		int cnt = 0;
@@ -58,14 +60,16 @@ void InsertNode(Node** head, Node* newNode, int pos) {
 }
 
 Node* DataBase_SearchNode(Node* list, int data) {
+	printf("[DataBase_SearchNode]\n");
 	if (IsEmpty(list)) return NULL;
-
+	int cnt = 1;
 	while (list != NULL) {
 		if (list->data == data) {
-			printf("Data Found %d\n", data);
+			printf("[%d] Data Found %d\n", cnt, data);
 			return list;
 		}
 		list = list->next;
+		cnt++;
 	}
 
 	printf("No List\n");
@@ -73,6 +77,7 @@ Node* DataBase_SearchNode(Node* list, int data) {
 }
 
 Node* PosBase_SearchNode(Node* head, int pos) {
+	printf("[PosBase_SearchNode]\n");
 	if (head == NULL) return NULL;
 	else {
 		int cnt = 0;
@@ -89,30 +94,38 @@ Node* PosBase_SearchNode(Node* head, int pos) {
 	}
 }
 
-/*
-Node* PosBase_RemoveNode(Node** head, int pos) {
-	if (IsEmpty(*head)) return NULL; 
-	Node* target = PosBase_SearchNode(*head, pos);
-	if (target == NULL) return NULL;
-
-	if (*head == target) *head = target->next;
-	else {
-		Node* current = *head;
-		while (current->next != target) {
-			current = current->next;
-		}
-		current->next = target->next;
-	}
-	target->next = NULL;
-	return target;
-}
-*/
-
 void DestroyNode(Node* target) {
+	printf("[DestroyNode]\n");
 	free(target);
 }
 
+void PosBase_RemoveNode(Node** head, int pos) {
+	printf("[PosBase_RemoveNode]\n");
+	if (IsEmpty(*head)) return;
+
+	int cnt = 0;
+	Node* target = *head;
+	while (cnt < pos) {
+		target = target->next;
+		if (target == NULL) {
+			printf("Position is over in this List so Last Node return");
+			break;
+		}
+		cnt++;
+	}
+	//printf("target : %p , head : %p [%d] \n", target, *head, target->data);
+	// target -> prev
+	//printf("target : %d , head : %d\n", target->prev->next->data, target->next->data);
+	target->prev->next = target->next;
+	//printf("target : %d , head : %d\n", target->next->prev->data, target->prev->data);
+	target->next->prev = target->prev;
+	target->next = NULL;
+	target->prev = NULL;
+	DestroyNode(target);
+}
+
 void DestroyList(Node** head) { // should do because of malloc
+	printf("[DestroyList]\n");
 	Node* remove = *head;
 	Node* next = *head;
 	while (remove != NULL) {
@@ -132,22 +145,39 @@ void PrintList(Node* current) {
 	}
 }
 
-
 int main(void) {
 
 	Node* A = NULL;
 	Node* newNode = NULL;
+	Node* tmpp = NULL;
 	int input, data;
 
+	for (int a = 1; a < 21; a++) {
+		newNode = NodeInit(a);
+		AppendNode(&A, newNode);
+	}
+	PrintList(A);
 	newNode = NodeInit(100);
-	AppendNode(&A, newNode);
-	newNode = NodeInit(200);
-	AppendNode(&A, newNode);
-	newNode = NodeInit(300);
-	AppendNode(&A, newNode);
+	InsertNode(&A, newNode, 10);
 	PrintList(A);
 
+	newNode = NodeInit(500);
+	InsertNode(&A, newNode, 10);
+	PrintList(A);
+
+	tmpp = DataBase_SearchNode(A, 100);
+	printf("%d\n", tmpp->data);
+	tmpp = PosBase_SearchNode(A, 13);
+	printf("%d\n", tmpp->data);
+
+	PosBase_RemoveNode(&A, 12);
+	PrintList(A);
+	PosBase_RemoveNode(&A, 12);
+	PrintList(A);
+	PosBase_RemoveNode(&A, 1);
+	PrintList(A);
 
 	DestroyList(&A);
+	PrintList(A);
 	return 0;
 }
